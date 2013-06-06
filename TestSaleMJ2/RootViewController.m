@@ -16,8 +16,13 @@
 @implementation RootViewController
 		
 @synthesize tableView, tabBar, naviBar;
-@synthesize DetailView;
+@synthesize detailView;
+@synthesize rootView;
 
+
+- (void) SetOwnDetailView:(DetailViewController *)view{
+    detailView = view;
+}
 
 #pragma - POPOver Handle
 - (IBAction) CreatePopOverController:(id)sender{
@@ -71,7 +76,10 @@
     
     
     localNameKeys = [[CustomerDataManager sharedInstance] GetCustomerNameKeys];
-    localNameList = [[CustomerDataManager sharedInstance] GetCustomerNameList];
+    localNameList = [[CustomerDataManager sharedInstance] GetCustomerNameList:@""];
+    
+    //sync
+    syncVC = [[SyncViewController alloc] init];
 }
 
 		
@@ -125,13 +133,23 @@
     
     UITableViewCell *cell = [_tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier] autorelease];
     }
 
     // Configure the cell.
     NSArray* array = [localNameList objectAtIndex:indexPath.section];
     
-    cell.textLabel.text = [array objectAtIndex:indexPath.row];
+    ContactProfile* profile = [array objectAtIndex:indexPath.row];
+
+    cell.textLabel.text = profile.name;  
+    cell.detailTextLabel.text = profile.group;
+    
+    if (profile.isActive) {
+        [cell setAccessoryType:UITableViewCellAccessoryCheckmark];
+    }
+    else{
+        [cell setAccessoryType:UITableViewCellAccessoryNone];
+    }
     		
     return cell;
 }
@@ -170,7 +188,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // Navigation logic may go here -- for example, create and push another view controller.
-   
+    [detailView LoadNewDetailView];
 }
 
 #pragma - Destructor Handle
@@ -194,6 +212,18 @@
     [popOverCtrl release];
     [createNewViewCtrl release];
     [super dealloc];
+}
+
+#pragma mark -
+#pragma mark Tapbar Delegate
+- (void)tabBar:(UITabBar *)tabBar didSelectItem:(UITabBarItem *)item {
+    
+    if ([item.title isEqual:@"Outbox"]) {
+        [self.rootView addSubview:syncVC.view];
+    }
+    else if ([item.title isEqual:@"Customer"]) {
+        [syncVC.view removeFromSuperview];
+    }
 }
 
 @end

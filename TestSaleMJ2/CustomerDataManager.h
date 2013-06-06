@@ -7,9 +7,37 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <sqlite3.h>
 
+
+@interface ContactProfile : NSObject {
+    NSString* profileCode;
+    NSString* name;
+    NSString* group;
+    BOOL      isActive;  
+}
+
+@property (retain, nonatomic) NSString* profileCode;
+@property (retain, nonatomic) NSString* name;
+@property (retain, nonatomic) NSString* group;
+@property (readwrite, nonatomic) BOOL isActive;
+
+
+@end
 
 @interface CustomerDataManager : NSObject {
+    
+    
+    
+    
+    //Database
+    sqlite3* contactDB;
+    NSString* databasePath_contactDB;
+    
+    //Local variable
+    
+    NSString* curSelectProfileCode;
+    
     NSArray* nameKeys;
     NSArray* nameList;
     
@@ -34,6 +62,7 @@
     NSArray* productRecommend;
     NSArray* status;
     NSArray* ses;
+   // Customer* customer;
 }
 
 @property (retain,nonatomic) NSArray* nameKeys;
@@ -60,52 +89,63 @@
 @property (retain,nonatomic) NSArray* productRecommend;
 @property (retain,nonatomic) NSArray* status;
 @property (retain,nonatomic) NSArray* ses;
+//@property (retain, nonatomic) Customer* customer;
 
 
 + (CustomerDataManager*)sharedInstance;
 
 // Customer name list
+//Use to get section header in customer name contact table
 - (NSArray*) GetCustomerNameKeys;
-- (NSArray*) GetCustomerNameList;
+
+//Use to get customer name in contact table
+- (NSArray*) GetCustomerNameList:(NSString*)type;
 
 - (NSArray*) GetCustomerType;
 
 //Customer Detail Tab
-- (NSString*) GetPictureProfilePath;
-- (NSString*) GetCustomerDetailName;
-- (NSString*) GetCustomerWorkName;
+- (NSString*) GetPictureProfilePath:(NSString*)profileCode;
+- (NSString*) GetCustomerDetailName:(NSString*)profileCode;
+- (NSString*) GetCustomerWorkName:(NSString*)profileCode;
 
-- (NSArray*) GetCustomerDetailSystemInfo;
-- (NSArray*) GetCustomerDetailPersonalInfo;
-- (NSArray*) GetCustomerDetailLocation;
-- (NSArray*) GetCustomerDetailEducationInfo;
-- (NSArray*) GetCustomerDetailFamilyInfo;
-- (NSInteger) GetCustomerDetailChildCount;
-- (NSArray*) GetCustomerDetailChildInfo;
-- (NSInteger) GetCustomerDetailHobbyInfoCount;
-- (NSArray*) GetCustomerDetailHobbyInfo;
-- (NSInteger) GetCustomerDetailMemberDetailCount;
-- (NSArray*) GetCustomerDetailMemberDetail;
-- (NSArray*) GetCustomerDetailHomeInfo;
-- (NSArray*) GetCustomerDetailClinicInfo;
-- (NSInteger) GetCustomerDetailWorkplaceDetailCount;
-- (NSArray*) GetCustomerDetailWorkplaceDetail;
-- (NSArray*) GetCustomerDetailBussinessDetail;
-- (NSArray*) GetCustomerDetailCustomerPatient;
-- (NSArray*) GetCustomerDetailProductRecommend;
-- (NSArray*) GetCustomerDetailStatus;
-- (NSArray*) GetCustomerDetailSES;
+- (NSArray*) GetCustomerDetailSystemInfo:(NSString*)profileCode;
+- (NSArray*) GetCustomerDetailPersonalInfo:(NSString*)profileCode;
+- (NSArray*) GetCustomerDetailLocation:(NSString*)profileCode;
+- (NSArray*) GetCustomerDetailEducationInfo:(NSString*)profileCode;
+- (NSArray*) GetCustomerDetailFamilyInfo:(NSString*)profileCode;
+- (NSInteger) GetCustomerDetailChildCount:(NSString*)profileCode;
+- (NSArray*) GetCustomerDetailChildInfo:(NSString*)profileCode;
+- (NSInteger) GetCustomerDetailHobbyInfoCount:(NSString*)profileCode;
+- (NSArray*) GetCustomerDetailHobbyInfo:(NSString*)profileCode;
+- (NSInteger) GetCustomerDetailMemberDetailCount:(NSString*)profileCode;
+- (NSArray*) GetCustomerDetailMemberDetail:(NSString*)profileCode;
+- (NSArray*) GetCustomerDetailHomeInfo:(NSString*)profileCode;
+- (NSArray*) GetCustomerDetailClinicInfo:(NSString*)profileCode;
+- (NSInteger) GetCustomerDetailWorkplaceDetailCount:(NSString*)profileCode;
+- (NSArray*) GetCustomerDetailWorkplaceDetail:(NSString*)profileCode;
+- (NSArray*) GetCustomerDetailBussinessDetail:(NSString*)profileCode;
+- (NSArray*) GetCustomerDetailCustomerPatient:(NSString*)profileCode;
+- (NSArray*) GetCustomerDetailProductRecommend:(NSString*)profileCode;
+- (NSArray*) GetCustomerDetailStatus:(NSString*)profileCode;
+- (NSArray*) GetCustomerDetailSES:(NSString*)profileCode;
 
-- (NSArray*) GetCustomerDetailEditChildInfo:(NSString*)childID;
-- (bool) SaveEditingChildInfo:(NSString*)childID Name:(NSString*)childname Sex:(NSString*)sex BirthDay:(NSString*)bd;
-- (bool) AddNewChildInfo:(NSString*)childID Name:(NSString*)childname Sex:(NSString*)sex BirthDay:(NSString*)bd;
+- (NSArray*) GetCustomerDetailEditChildInfo:(NSString*)profileCode WithChild:(NSString*)childID;
 
-- (NSArray*) GetCustomerDetailEditHobbyInfo:(NSString*)hobbyID;
-- (bool) SaveEditingHobbyInfo:(NSString*)hobbyID Type:(NSString*)hobbyType Description:(NSString*)desc;
-- (bool) AddNewHobbyInfo:(NSString*)hobbyID Type:(NSString*)hobbyType Description:(NSString*)desc;
+- (bool) SaveEditingChildInfo:(NSString*)profileCode withChild:(NSString*)childID Name:(NSString*)childname Sex:(NSString*)sex BirthDay:(NSString*)bd;
+
+- (bool) AddNewChildInfo:(NSString*)profileCode withChild:(NSString*)childID Name:(NSString*)childname Sex:(NSString*)sex BirthDay:(NSString*)bd;
+
+- (NSArray*) GetCustomerDetailEditHobbyInfo:(NSString*)profileCode withHobby:(NSString*)hobbyID;
+
+- (bool) SaveEditingHobbyInfo:(NSString*)profileCode withHobby:(NSString*)hobbyID Type:(NSString*)hobbyType Description:(NSString*)desc;
+
+- (bool) AddNewHobbyInfo:(NSString*)profileCode withHobby:(NSString*)hobbyID Type:(NSString*)hobbyType Description:(NSString*)desc;
+
 - (NSArray*) GetHobbyList;
 
-- (NSArray*) GetCustomerDetailEditWorkplaceDetail:(NSString*)workplaceID;
-- (bool) SaveEditingWorkplaceDetail:(NSString*)workplaceID Hospital:(NSString*)hospitalName Department:(NSString*)DepartName Building:(NSString*)buildingName WorkTime:(NSString*)worktime;
-- (bool) AddNewWorkplaceDetail:(NSString*)workplaceID Hospital:(NSString*)hospitalName Department:(NSString*)DepartName Building:(NSString*)buildingName WorkTime:(NSString*)worktime;
+- (NSArray*) GetCustomerDetailEditWorkplaceDetail:(NSString*)profileCode withWorkplace:(NSString*)workplaceID;
+
+- (bool) SaveEditingWorkplaceDetail:(NSString*)profileCode withWorkplace:(NSString*)workplaceID Hospital:(NSString*)hospitalName Department:(NSString*)DepartName Building:(NSString*)buildingName WorkTime:(NSString*)worktime;
+
+- (bool) AddNewWorkplaceDetail:(NSString*)profileCode withWorkplace:(NSString*)workplaceID Hospital:(NSString*)hospitalName Department:(NSString*)DepartName Building:(NSString*)buildingName WorkTime:(NSString*)worktime;
 @end
